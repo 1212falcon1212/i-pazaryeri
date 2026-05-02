@@ -7,6 +7,11 @@ export function ProjectCard({ project }: { project: Project }) {
       <div className="project-media" style={{ "--accent": project.accent } as React.CSSProperties}>
         <span className="tag">{project.category}</span>
         <h3>{project.title}</h3>
+        <div className="project-device">
+          <span />
+          <span />
+          <span />
+        </div>
       </div>
       <div className="project-body">
         <div className="meta"><span>{project.status}</span><span>{project.sector}</span></div>
@@ -16,4 +21,3 @@ export function ProjectCard({ project }: { project: Project }) {
     </article>
   );
 }
-

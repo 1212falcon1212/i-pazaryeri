@@ -14,10 +14,9 @@ export function Header({ settings }: { settings: SiteSetting }) {
         </Link>
         <nav className="nav-links" aria-label="Ana menü">
           {navItems.map(([label, href]) => <Link key={href} href={href}>{label}</Link>)}
-          <Link className="btn" href={settings.primaryCtaHref}>{settings.primaryCtaLabel}<ArrowRight size={17} /></Link>
+          <Link className="btn nav-cta" href={settings.primaryCtaHref}>{settings.primaryCtaLabel}<ArrowRight size={17} /></Link>
         </nav>
       </div>
     </header>
   );
 }
-

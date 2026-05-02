@@ -10,9 +10,9 @@ export default async function HomePage() {
   return (
     <PublicShell>
       <main>
-        <section className="hero">
+        <section className="hero premium-hero">
           <div className="container hero-grid">
-            <div>
+            <div className="hero-copy reveal">
               <h1>{settings.heroTitle}</h1>
               <p className="lead">{settings.heroDescription}</p>
               <div className="hero-actions">
@@ -26,6 +26,8 @@ export default async function HomePage() {
               </div>
             </div>
             <div className="market-visual" aria-hidden="true">
+              <div className="orb orb-a" />
+              <div className="orb orb-b" />
               <div className="screen">
                 <div className="screen-top"><span className="dot" /><span className="dot" /><span className="dot" /></div>
                 <div className="screen-body">
@@ -37,34 +39,36 @@ export default async function HomePage() {
                 </div>
               </div>
               <div className="float-card"><strong>%34</strong><span>daha hızlı sipariş toplama</span></div>
+              <div className="mini-panel mini-panel-a"><b>Canlı katalog</b><span>12.480 ürün senkron</span></div>
+              <div className="mini-panel mini-panel-b"><b>Bayi siparişi</b><span>Onay bekleyen 24 talep</span></div>
             </div>
           </div>
         </section>
-        <section className="section section-muted">
+        <section className="section section-muted proof-showcase reveal">
           <div className="container">
             <div className="section-head"><div><h2>{settings.projectsTitle}</h2><p>{settings.projectsDescription}</p></div><Link className="btn btn-soft" href="/projeler">Tüm projeler</Link></div>
             <div className="project-grid">{projects.map((project) => <ProjectCard key={project.id} project={project} />)}</div>
           </div>
         </section>
-        <section className="section">
+        <section className="section reveal">
           <div className="container">
             <div className="section-head"><div><h2>{settings.sectorsTitle}</h2><p>{settings.sectorsDescription}</p></div></div>
             <div className="sector-grid">{sectors.map((sector) => <article className="sector-card" key={sector.id}><span className="icon-badge" style={{ color: sector.accent }}>●</span><h3>{sector.title}</h3><p>{sector.shortDesc}</p></article>)}</div>
           </div>
         </section>
-        <section className="section section-muted">
+        <section className="section section-muted reveal">
           <div className="container">
             <div className="section-head"><div><h2>{settings.featuresTitle}</h2><p>{settings.featuresDescription}</p></div></div>
             <div className="feature-grid">{features.map((feature) => <article className="feature-card" key={feature.id}><FeatureIcon name={feature.icon} /><h3>{feature.title}</h3><p>{feature.shortDesc}</p></article>)}</div>
           </div>
         </section>
-        <section className="section">
+        <section className="section reveal">
           <div className="container">
             <div className="section-head"><div><h2>{settings.processTitle}</h2><p>{settings.processDescription}</p></div></div>
             <div className="process">{["İhtiyaç analizi", "Sektör uyarlaması", "Veri ve entegrasyon", "Yayın ve iyileştirme"].map((step) => <div className="process-step" key={step}><b>{step}</b><p>Net kapsam, kontrollü kurulum ve ölçülebilir ilerleme.</p></div>)}</div>
           </div>
         </section>
-        <section className="section">
+        <section className="section reveal">
           <div className="container cta-band"><div><h2>{settings.finalCtaTitle}</h2><p>{settings.finalCtaDescription}</p></div><Link className="btn" href={settings.primaryCtaHref}>{settings.primaryCtaLabel}</Link></div>
         </section>
       </main>
