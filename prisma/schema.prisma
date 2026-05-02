@@ -1,0 +1,124 @@
+datasource db {
+  provider = "sqlite"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model SiteSetting {
+  id                 String   @id @default("singleton")
+  siteName           String
+  logoText           String
+  heroTitle          String
+  heroDescription    String
+  primaryCtaLabel    String
+  primaryCtaHref     String
+  projectsTitle      String
+  projectsDescription String
+  sectorsTitle       String
+  sectorsDescription String
+  featuresTitle      String
+  featuresDescription String
+  processTitle       String
+  processDescription String
+  finalCtaTitle      String
+  finalCtaDescription String
+  contactEmail       String?
+  contactPhone       String?
+  seoTitle           String?
+  seoDescription     String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+model Project {
+  id             String   @id @default(cuid())
+  slug           String   @unique
+  title          String
+  category       String
+  sector         String
+  status         String   @default("Yayında")
+  shortDesc      String
+  content        String
+  coverImage     String?
+  accent         String   @default("#0f8ea8")
+  year           Int?
+  liveUrl        String?
+  isFeatured     Boolean  @default(false)
+  isPublished    Boolean  @default(true)
+  sortOrder      Int      @default(0)
+  seoTitle       String?
+  seoDescription String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([isFeatured])
+  @@index([isPublished])
+  @@index([sortOrder])
+}
+
+model Feature {
+  id             String   @id @default(cuid())
+  slug           String   @unique
+  title          String
+  icon           String
+  shortDesc      String
+  content        String
+  isPublished    Boolean  @default(true)
+  sortOrder      Int      @default(0)
+  seoTitle       String?
+  seoDescription String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Sector {
+  id             String   @id @default(cuid())
+  slug           String   @unique
+  title          String
+  shortDesc      String
+  content        String
+  accent         String   @default("#13a88b")
+  isFeatured     Boolean  @default(false)
+  isPublished    Boolean  @default(true)
+  sortOrder      Int      @default(0)
+  seoTitle       String?
+  seoDescription String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Post {
+  id             String   @id @default(cuid())
+  slug           String   @unique
+  title          String
+  excerpt        String
+  content        String
+  coverImage     String?
+  tag            String   @default("Rehber")
+  isPublished    Boolean  @default(true)
+  sortOrder      Int      @default(0)
+  seoTitle       String?
+  seoDescription String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model OfferRequest {
+  id          String   @id @default(cuid())
+  fullName    String
+  company     String
+  email       String?
+  phone       String?
+  sector      String
+  networkSize String?
+  modules     String?
+  message     String
+  status      String   @default("Yeni")
+  internalNote String?
+  isRead      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
