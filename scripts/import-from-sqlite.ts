@@ -15,10 +15,22 @@
 
 import Database from "better-sqlite3";
 import { PrismaClient } from "@prisma/client";
+import { PrismaMariaDb } from "@prisma/adapter-mariadb";
+import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 
 const SRC = process.env.SOURCE_SQLITE ?? "./scripts/dev.db";
 const sqlite = new Database(SRC, { readonly: true });
-const prisma = new PrismaClient();
+
+function makeClient(): PrismaClient {
+  const url = process.env.DATABASE_URL ?? "";
+  if (url.startsWith("mysql://") || url.startsWith("mariadb://")) {
+    return new PrismaClient({ adapter: new PrismaMariaDb(url) });
+  }
+  const filePath = url.startsWith("file:") ? url.slice("file:".length) : url || "./dev.db";
+  return new PrismaClient({ adapter: new PrismaBetterSqlite3({ url: filePath }) });
+}
+
+const prisma = makeClient();
 
 function rows<T = Record<string, unknown>>(table: string): T[] {
   return sqlite.prepare(`SELECT * FROM "${table}"`).all() as T[];
