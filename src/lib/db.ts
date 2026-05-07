@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
+import { PrismaMariaDb } from "@prisma/adapter-mariadb";
 
 const globalForPrisma = globalThis as unknown as {
   prisma?: PrismaClient;
@@ -7,6 +8,14 @@ const globalForPrisma = globalThis as unknown as {
 
 function createPrisma() {
   const url = process.env.DATABASE_URL ?? "file:./dev.db";
+
+  // MySQL / MariaDB in production
+  if (url.startsWith("mysql://") || url.startsWith("mariadb://")) {
+    const adapter = new PrismaMariaDb(url);
+    return new PrismaClient({ adapter });
+  }
+
+  // Default: SQLite (local dev)
   const filePath = url.startsWith("file:") ? url.slice("file:".length) : url;
   const adapter = new PrismaBetterSqlite3({ url: filePath });
   return new PrismaClient({ adapter });
@@ -17,4 +26,3 @@ export const prisma: PrismaClient = globalForPrisma.prisma ?? createPrisma();
 if (process.env.NODE_ENV !== "production") {
   globalForPrisma.prisma = prisma;
 }
-
