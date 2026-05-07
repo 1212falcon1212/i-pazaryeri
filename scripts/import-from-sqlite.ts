@@ -13,6 +13,7 @@
  *   - uses upsert so re-runs are idempotent
  */
 
+import "dotenv/config";
 import Database from "better-sqlite3";
 import { PrismaClient } from "@prisma/client";
 import { PrismaMariaDb } from "@prisma/adapter-mariadb";
