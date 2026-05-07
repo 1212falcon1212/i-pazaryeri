@@ -13,6 +13,7 @@ export async function createOffer(formData: FormData) {
     sector: formData.get("sector"),
     networkSize: formData.get("networkSize"),
     modules: formData.get("modules"),
+    selectedServices: formData.getAll("selectedServices"),
     message: formData.get("message")
   });
 
@@ -23,4 +24,3 @@ export async function createOffer(formData: FormData) {
   await prisma.offerRequest.create({ data: result.data });
   redirect("/teklif-al?success=1");
 }
-

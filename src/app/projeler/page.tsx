@@ -9,7 +9,8 @@ export default async function ProjectsPage() {
       <main>
         <section className="page-hero">
           <div className="container page-title">
-            <h1>Projeler</h1>
+            <span className="section-kicker">Çalışan sistem kanıtları</span>
+            <h1>Referans projeler</h1>
             <p>{settings.projectsDescription}</p>
           </div>
         </section>
@@ -20,4 +21,3 @@ export default async function ProjectsPage() {
     </PublicShell>
   );
 }
-

@@ -4,10 +4,17 @@ import { logout } from "@/app/admin/actions";
 const links = [
   ["Panel", "/admin"],
   ["Ayarlar", "/admin/settings"],
+  ["Ana Sayfa", "/admin/home"],
   ["Projeler", "/admin/projects"],
-  ["Özellikler", "/admin/features"],
+  ["Servisler / Modüller", "/admin/features"],
+  ["Çözüm Kartları", "/admin/solution-cards"],
+  ["Paketler", "/admin/packages"],
+  ["Sık Sorulan Sorular", "/admin/faqs"],
+  ["SEO Yazısı", "/admin/seo-article"],
   ["Sektörler", "/admin/sectors"],
+  ["Müşteri yorumları", "/admin/testimonials"],
   ["Blog", "/admin/blog"],
+  ["Teklif seçenekleri", "/admin/offer-options"],
   ["Teklifler", "/admin/offers"],
   ["Siteye dön", "/"]
 ];
@@ -26,4 +33,3 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     </div>
   );
 }
-

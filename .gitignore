@@ -3,8 +3,21 @@ node_modules
 dev.db
 dev.db-journal
 prisma/dev.db
-public/uploads/*
-!public/uploads/.gitkeep
 .env
 .DS_Store
+.superpowers
+tsconfig.tsbuildinfo
 
+# Uploads: ignore by default, but track existing seed assets so a fresh clone has working images
+public/uploads/*
+!public/uploads/.gitkeep
+!public/uploads/blog/
+!public/uploads/blog/**
+!public/uploads/services/
+!public/uploads/services/**
+!public/uploads/projects/
+!public/uploads/projects/**
+!public/uploads/hero-*.png
+!public/uploads/hero-*.webp
+!public/uploads/banner-*.png
+!public/uploads/banner-*.webp

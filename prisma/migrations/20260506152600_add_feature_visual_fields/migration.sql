@@ -1,0 +1,3 @@
+ALTER TABLE "Feature" ADD COLUMN "visualType" TEXT NOT NULL DEFAULT 'icon';
+ALTER TABLE "Feature" ADD COLUMN "visualImage" TEXT;
+ALTER TABLE "Feature" ADD COLUMN "visualAccent" TEXT DEFAULT '#B87333';

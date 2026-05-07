@@ -32,4 +32,33 @@ describe("validateOfferInput", () => {
     expect(result.ok).toBe(false);
     expect(result.errors).toContain("Telefon veya e-posta gereklidir.");
   });
+
+  it("serializes selected service options for offer requests", () => {
+    const result = validateOfferInput({
+      fullName: "Ayşe Demir",
+      company: "Demir Dağıtım",
+      email: "ayse@example.com",
+      phone: "",
+      sector: "Toptan ticaret",
+      networkSize: "120 bayi",
+      modules: "",
+      selectedServices: ["bayi-yonetimi", "erp-entegrasyonu", "fiyat-listeleri"],
+      message: "Bayi fiyat listelerini ve ERP stok bilgisini portala taşımak istiyoruz."
+    });
+
+    expect(result).toEqual({
+      ok: true,
+      data: {
+        fullName: "Ayşe Demir",
+        company: "Demir Dağıtım",
+        email: "ayse@example.com",
+        phone: "",
+        sector: "Toptan ticaret",
+        networkSize: "120 bayi",
+        modules: "",
+        selectedServices: "bayi-yonetimi, erp-entegrasyonu, fiyat-listeleri",
+        message: "Bayi fiyat listelerini ve ERP stok bilgisini portala taşımak istiyoruz."
+      }
+    });
+  });
 });

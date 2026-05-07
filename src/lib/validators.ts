@@ -6,6 +6,7 @@ export type OfferInput = {
   sector: unknown;
   networkSize: unknown;
   modules: unknown;
+  selectedServices?: unknown;
   message: unknown;
 };
 
@@ -17,6 +18,14 @@ function clean(value: unknown) {
   return typeof value === "string" ? value.trim() : "";
 }
 
+function cleanMulti(value: unknown) {
+  if (Array.isArray(value)) {
+    return value.map(clean).filter(Boolean).join(", ");
+  }
+
+  return clean(value);
+}
+
 export function validateOfferInput(input: OfferInput): OfferValidation {
   const data = {
     fullName: clean(input.fullName),
@@ -26,6 +35,7 @@ export function validateOfferInput(input: OfferInput): OfferValidation {
     sector: clean(input.sector),
     networkSize: clean(input.networkSize),
     modules: clean(input.modules),
+    selectedServices: cleanMulti(input.selectedServices),
     message: clean(input.message)
   };
 
@@ -43,4 +53,3 @@ export function validateOfferInput(input: OfferInput): OfferValidation {
 
   return { ok: true, data };
 }
-

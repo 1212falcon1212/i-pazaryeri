@@ -1,11 +1,12 @@
 import { PublicShell } from "@/components/public/PublicShell";
-import { getSectors, getSettings } from "@/lib/content";
+import { getOfferServiceOptions, getSectors, getSettings } from "@/lib/content";
 import { createOffer } from "./actions";
 
 type Props = { searchParams: Promise<{ success?: string; error?: string }> };
 
 export default async function OfferPage({ searchParams }: Props) {
   const [settings, sectors, query] = await Promise.all([getSettings(), getSectors(), searchParams]);
+  const serviceOptions = await getOfferServiceOptions();
   return (
     <PublicShell>
       <main>
@@ -22,6 +23,19 @@ export default async function OfferPage({ searchParams }: Props) {
               <div className="field"><label>Telefon</label><input name="phone" /></div>
               <div className="field"><label>Sektör</label><select name="sector" required>{sectors.map((sector) => <option key={sector.id}>{sector.title}</option>)}</select></div>
               <div className="field"><label>Bayi / tedarikçi sayısı</label><input name="networkSize" placeholder="Örn. 50 bayi" /></div>
+              {serviceOptions.length > 0 ? (
+                <div className="field full">
+                  <label>İlgilendiğiniz servisler</label>
+                  <div className="choice-grid">
+                    {serviceOptions.map((option) => (
+                      <label className="choice-pill" key={option.id}>
+                        <input type="checkbox" name="selectedServices" value={option.value} />
+                        <span>{option.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
               <div className="field full"><label>İstenen modüller</label><input name="modules" placeholder="Sipariş, stok, cari, ERP entegrasyonu..." /></div>
               <div className="field full"><label>Kısa ihtiyaç notu</label><textarea name="message" required /></div>
               <button className="btn btn-primary" type="submit">{settings.primaryCtaLabel}</button>
