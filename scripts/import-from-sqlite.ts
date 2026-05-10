@@ -62,21 +62,6 @@ async function main() {
   }
   console.log(`✓ SiteSetting: ${settings.length}`);
 
-  // 2. Project
-  const projects = rows("Project");
-  for (const p of projects) {
-    const r = p as any;
-    const data = {
-      ...r,
-      isFeatured: asBool(r.isFeatured),
-      isPublished: asBool(r.isPublished),
-      createdAt: asDate(r.createdAt),
-      updatedAt: asDate(r.updatedAt)
-    };
-    await prisma.project.upsert({ where: { id: r.id }, update: data, create: data });
-  }
-  console.log(`✓ Project: ${projects.length}`);
-
   // 3. Feature
   const features = rows("Feature");
   for (const f of features) {
@@ -261,6 +246,114 @@ async function main() {
     await prisma.offerServiceOption.upsert({ where: { id: r.id }, update: data, create: data });
   }
   console.log(`✓ OfferServiceOption: ${serviceOptions.length}`);
+
+  // 16. BusinessModelCard (FAZ 1)
+  const bmCards = rows("BusinessModelCard");
+  for (const bc of bmCards) {
+    const r = bc as any;
+    const data = { ...r, isPublished: asBool(r.isPublished), createdAt: asDate(r.createdAt), updatedAt: asDate(r.updatedAt) };
+    await prisma.businessModelCard.upsert({ where: { id: r.id }, update: data, create: data });
+  }
+  console.log(`✓ BusinessModelCard: ${bmCards.length}`);
+
+  // 17. HomeStat
+  const homeStats = rows("HomeStat");
+  for (const hs of homeStats) {
+    const r = hs as any;
+    const data = { ...r, isPublished: asBool(r.isPublished), createdAt: asDate(r.createdAt), updatedAt: asDate(r.updatedAt) };
+    await prisma.homeStat.upsert({ where: { id: r.id }, update: data, create: data });
+  }
+  console.log(`✓ HomeStat: ${homeStats.length}`);
+
+  // 18. PlatformShowcaseCard
+  const psCards = rows("PlatformShowcaseCard");
+  for (const ps of psCards) {
+    const r = ps as any;
+    const data = { ...r, isPublished: asBool(r.isPublished), createdAt: asDate(r.createdAt), updatedAt: asDate(r.updatedAt) };
+    await prisma.platformShowcaseCard.upsert({ where: { id: r.id }, update: data, create: data });
+  }
+  console.log(`✓ PlatformShowcaseCard: ${psCards.length}`);
+
+  // 19. IntegrationGroup
+  const intGroups = rows("IntegrationGroup");
+  for (const ig of intGroups) {
+    const r = ig as any;
+    const data = { ...r, isPublished: asBool(r.isPublished), createdAt: asDate(r.createdAt), updatedAt: asDate(r.updatedAt) };
+    await prisma.integrationGroup.upsert({ where: { id: r.id }, update: data, create: data });
+  }
+  console.log(`✓ IntegrationGroup: ${intGroups.length}`);
+
+  // 20. Integration
+  const integrations = rows("Integration");
+  for (const it of integrations) {
+    const r = it as any;
+    const data = { ...r, isPublished: asBool(r.isPublished), createdAt: asDate(r.createdAt), updatedAt: asDate(r.updatedAt) };
+    await prisma.integration.upsert({ where: { id: r.id }, update: data, create: data });
+  }
+  console.log(`✓ Integration: ${integrations.length}`);
+
+  // 21. BusinessModelPage (FAZ 2)
+  const bmPages = rows("BusinessModelPage");
+  for (const bp of bmPages) {
+    const r = bp as any;
+    const data = { ...r, isPublished: asBool(r.isPublished), createdAt: asDate(r.createdAt), updatedAt: asDate(r.updatedAt) };
+    await prisma.businessModelPage.upsert({ where: { id: r.id }, update: data, create: data });
+  }
+  console.log(`✓ BusinessModelPage: ${bmPages.length}`);
+
+  // 22. BusinessModelHighlight
+  const bmHighlights = rows("BusinessModelHighlight");
+  for (const bh of bmHighlights) {
+    const r = bh as any;
+    const data = { ...r, createdAt: asDate(r.createdAt), updatedAt: asDate(r.updatedAt) };
+    await prisma.businessModelHighlight.upsert({ where: { id: r.id }, update: data, create: data });
+  }
+  console.log(`✓ BusinessModelHighlight: ${bmHighlights.length}`);
+
+  // 23. BusinessModelUseCase
+  const bmUseCases = rows("BusinessModelUseCase");
+  for (const bu of bmUseCases) {
+    const r = bu as any;
+    const data = { ...r, createdAt: asDate(r.createdAt), updatedAt: asDate(r.updatedAt) };
+    await prisma.businessModelUseCase.upsert({ where: { id: r.id }, update: data, create: data });
+  }
+  console.log(`✓ BusinessModelUseCase: ${bmUseCases.length}`);
+
+  // 24. BusinessModelMetric
+  const bmMetrics = rows("BusinessModelMetric");
+  for (const bm of bmMetrics) {
+    const r = bm as any;
+    const data = { ...r, createdAt: asDate(r.createdAt), updatedAt: asDate(r.updatedAt) };
+    await prisma.businessModelMetric.upsert({ where: { id: r.id }, update: data, create: data });
+  }
+  console.log(`✓ BusinessModelMetric: ${bmMetrics.length}`);
+
+  // 25. StaticPage (FAZ 3)
+  const staticPages = rows("StaticPage");
+  for (const sp of staticPages) {
+    const r = sp as any;
+    const data = { ...r, isPublished: asBool(r.isPublished), createdAt: asDate(r.createdAt), updatedAt: asDate(r.updatedAt) };
+    await prisma.staticPage.upsert({ where: { id: r.id }, update: data, create: data });
+  }
+  console.log(`✓ StaticPage: ${staticPages.length}`);
+
+  // 26. JobRole
+  const jobRoles = rows("JobRole");
+  for (const jr of jobRoles) {
+    const r = jr as any;
+    const data = { ...r, isPublished: asBool(r.isPublished), createdAt: asDate(r.createdAt), updatedAt: asDate(r.updatedAt) };
+    await prisma.jobRole.upsert({ where: { id: r.id }, update: data, create: data });
+  }
+  console.log(`✓ JobRole: ${jobRoles.length}`);
+
+  // 27. FooterLink
+  const footerLinks = rows("FooterLink");
+  for (const fl of footerLinks) {
+    const r = fl as any;
+    const data = { ...r, isPublished: asBool(r.isPublished), createdAt: asDate(r.createdAt), updatedAt: asDate(r.updatedAt) };
+    await prisma.footerLink.upsert({ where: { id: r.id }, update: data, create: data });
+  }
+  console.log(`✓ FooterLink: ${footerLinks.length}`);
 
   console.log("\n✅ Import complete.");
   await prisma.$disconnect();

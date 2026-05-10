@@ -1,8 +1,12 @@
 export const brandTheme = {
-  accent: "#2F6B4F",
-  accentHover: "#25543F",
-  copper: "#B87333",
-  copperSoft: "#F3D6BE",
-  forest: "#12382B",
-  leaf: "#6FA77A"
+  primary: "#2563EB",
+  primaryHover: "#1D4FD7",
+  primarySoft: "#EFF4FF",
+  copper: "#C97A3A",
+  copperSoft: "#FCEDE0",
+  forest: "#0F1730",
+  leaf: "#5B85F0",
+  // Backwards-compat alias
+  accent: "#2563EB",
+  accentHover: "#1D4FD7"
 };

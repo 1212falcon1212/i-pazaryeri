@@ -1,9 +1,12 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, BookOpen, Calendar, Clock, Mail, Phone } from "lucide-react";
 import { PublicShell } from "@/components/public/PublicShell";
-import { RichContent } from "@/components/public/RichContent";
+import { RichContent, parseHeadings } from "@/components/public/RichContent";
+import { BlogTOC } from "@/components/public/BlogTOC";
+import { ReadingProgress } from "@/components/public/ReadingProgress";
+import { BlogShare } from "@/components/public/BlogShare";
 import { getPost, getRelatedPosts } from "@/lib/content";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -16,14 +19,36 @@ export async function generateMetadata({ params }: Props) {
   };
 }
 
+const WPM = 200;
+
+function calcReadingTime(content: string): number {
+  const words = content
+    .replace(/[#>*`_-]/g, " ")
+    .split(/\s+/)
+    .filter((w) => w.length > 1).length;
+  return Math.max(1, Math.round(words / WPM));
+}
+
+function formatDate(date: Date): string {
+  return new Intl.DateTimeFormat("tr-TR", {
+    day: "numeric",
+    month: "long",
+    year: "numeric"
+  }).format(new Date(date));
+}
+
 export default async function BlogDetailPage({ params }: Props) {
   const { slug } = await params;
   const post = await getPost(slug);
   if (!post) notFound();
   const related = await getRelatedPosts(slug, post.tag);
+  const headings = parseHeadings(post.content);
+  const readingTime = calcReadingTime(post.content);
+  const publishedAt = formatDate(post.createdAt);
 
   return (
     <PublicShell>
+      <ReadingProgress targetId="blog-article" />
       <main>
         <section className="page-hero blog-detail-hero">
           <div className="container blog-detail-head">
@@ -33,6 +58,18 @@ export default async function BlogDetailPage({ params }: Props) {
             {post.tag ? <span className="article-tag">{post.tag}</span> : null}
             <h1>{post.title}</h1>
             <p>{post.excerpt}</p>
+            <div className="blog-detail-meta">
+              <span className="blog-meta-chip">
+                <Calendar size={14} /> {publishedAt}
+              </span>
+              <span className="blog-meta-chip">
+                <Clock size={14} /> {readingTime} dk okuma
+              </span>
+              <span className="blog-meta-chip blog-meta-chip-author">
+                <span className="blog-meta-avatar" aria-hidden="true">İP</span>
+                i-Pazaryeri Editör Ekibi
+              </span>
+            </div>
           </div>
         </section>
 
@@ -54,9 +91,63 @@ export default async function BlogDetailPage({ params }: Props) {
         ) : null}
 
         <section className="section blog-detail-body-section">
-          <article className="container card blog-detail-body">
-            <RichContent content={post.content} />
-          </article>
+          <div className="container blog-detail-grid">
+            <article id="blog-article" className="blog-detail-body">
+              <RichContent content={post.content} />
+
+              <div className="blog-article-footer">
+                <BlogShare title={post.title} slug={post.slug} />
+                {post.tag ? (
+                  <div className="blog-article-tags">
+                    <span className="blog-article-tags-label">Etiket</span>
+                    <Link href={`/blog?tag=${encodeURIComponent(post.tag)}`} className="blog-article-tag-pill">
+                      #{post.tag}
+                    </Link>
+                  </div>
+                ) : null}
+              </div>
+            </article>
+
+            <aside className="blog-detail-sidebar">
+              <div className="blog-sidebar-sticky">
+                <BlogTOC headings={headings} />
+
+                <div className="blog-sidebar-card blog-sidebar-cta">
+                  <div className="blog-sidebar-cta-icon" aria-hidden="true">
+                    <BookOpen size={18} />
+                  </div>
+                  <h3>Bu konuyu projenize uyarlayalım</h3>
+                  <p>30 dakikalık ücretsiz analizde sektörünüze özel modülleri ve entegrasyon ihtiyaçlarınızı birlikte konuşuyoruz.</p>
+                  <Link href="/teklif-al" className="btn btn-accent btn-sm blog-sidebar-cta-btn">
+                    Teklif Al <ArrowRight size={14} />
+                  </Link>
+                  <div className="blog-sidebar-cta-divider" />
+                  <a href="mailto:info@i-pazaryeri.com" className="blog-sidebar-link">
+                    <Mail size={14} /> info@i-pazaryeri.com
+                  </a>
+                  <a href="tel:+908504411111" className="blog-sidebar-link">
+                    <Phone size={14} /> +90 850 441 11 11
+                  </a>
+                </div>
+
+                {related.length > 0 ? (
+                  <div className="blog-sidebar-card blog-sidebar-related">
+                    <div className="blog-sidebar-card-title">Sıradaki yazılar</div>
+                    <ul className="blog-sidebar-related-list">
+                      {related.slice(0, 3).map((rp) => (
+                        <li key={rp.id}>
+                          <Link href={`/blog/${rp.slug}`}>
+                            <span className="blog-sidebar-related-title">{rp.title}</span>
+                            {rp.tag ? <span className="blog-sidebar-related-tag">{rp.tag}</span> : null}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
+              </div>
+            </aside>
+          </div>
         </section>
 
         <section className="blog-cta-band">
@@ -70,8 +161,8 @@ export default async function BlogDetailPage({ params }: Props) {
               <Link className="btn btn-accent btn-lg" href="/teklif-al">
                 Teklif Al <ArrowRight size={16} />
               </Link>
-              <Link className="btn btn-soft btn-lg" href="/projeler">
-                Çalışan projeler
+              <Link className="btn btn-soft btn-lg" href="/blog">
+                Tüm yazılar
               </Link>
             </div>
           </div>

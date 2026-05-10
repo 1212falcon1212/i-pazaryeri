@@ -73,7 +73,18 @@ export async function updateSettings(formData: FormData) {
       contactEmail: optional(formData, "contactEmail"),
       contactPhone: optional(formData, "contactPhone"),
       seoTitle: optional(formData, "seoTitle"),
-      seoDescription: optional(formData, "seoDescription")
+      seoDescription: optional(formData, "seoDescription"),
+      heroEyebrow: optional(formData, "heroEyebrow"),
+      heroRotatingWords: optional(formData, "heroRotatingWords"),
+      heroTitleLead: optional(formData, "heroTitleLead"),
+      heroTitleConnector: optional(formData, "heroTitleConnector"),
+      heroHighlight: optional(formData, "heroHighlight"),
+      heroChecklist: optional(formData, "heroChecklist"),
+      heroPrimaryCta: optional(formData, "heroPrimaryCta"),
+      heroSecondaryCta: optional(formData, "heroSecondaryCta"),
+      trustTags: optional(formData, "trustTags"),
+      integrationsTitle: optional(formData, "integrationsTitle"),
+      integrationsDesc: optional(formData, "integrationsDesc")
     }
   });
   revalidatePath("/");
@@ -116,51 +127,6 @@ export async function clearHeroBanner() {
   });
   revalidatePath("/");
   redirect("/admin/settings?saved=1");
-}
-
-export async function uploadProjectImage(formData: FormData) {
-  await requireAdmin();
-  const id = str(formData, "id");
-  const file = formData.get("file");
-  if (!id) redirect("/admin/projects?error=Proje+ID+yok");
-  if (!(file instanceof File) || file.size === 0) {
-    redirect("/admin/projects?error=Dosya+seçilmedi");
-  }
-  if (file.size > MAX_UPLOAD_BYTES) {
-    redirect("/admin/projects?error=Dosya+10MB%27dan+büyük+olamaz");
-  }
-  if (!ALLOWED_IMAGE_TYPES.has(file.type)) {
-    redirect("/admin/projects?error=Sadece+jpg%2C+png%2C+webp%2C+gif+veya+svg+yüklenebilir");
-  }
-
-  const project = await prisma.project.findUnique({ where: { id } });
-  if (!project) redirect("/admin/projects?error=Proje+bulunamadı");
-
-  const ext = file.name.includes(".") ? file.name.split(".").pop()!.toLowerCase().replace(/[^a-z0-9]/g, "") : "img";
-  const filename = `${project.slug}-${Date.now()}.${ext || "img"}`;
-  const uploadDir = path.join(process.cwd(), "public", "uploads", "projects");
-  await mkdir(uploadDir, { recursive: true });
-  const buffer = Buffer.from(await file.arrayBuffer());
-  await writeFile(path.join(uploadDir, filename), buffer);
-
-  await prisma.project.update({
-    where: { id },
-    data: { coverImage: `/uploads/projects/${filename}` }
-  });
-  revalidatePath("/");
-  revalidatePath("/projeler");
-  redirect("/admin/projects?saved=1");
-}
-
-export async function clearProjectImage(formData: FormData) {
-  await requireAdmin();
-  const id = str(formData, "id");
-  if (id) {
-    await prisma.project.update({ where: { id }, data: { coverImage: null } });
-  }
-  revalidatePath("/");
-  revalidatePath("/projeler");
-  redirect("/admin/projects?saved=1");
 }
 
 export async function saveTestimonial(formData: FormData) {
@@ -386,32 +352,6 @@ export async function deleteOfferServiceOption(formData: FormData) {
   redirect("/admin/offer-options?deleted=1");
 }
 
-export async function saveProject(formData: FormData) {
-  await requireAdmin();
-  const id = str(formData, "id");
-  const data = {
-    slug: str(formData, "slug"),
-    title: str(formData, "title"),
-    category: str(formData, "category"),
-    sector: str(formData, "sector"),
-    status: str(formData, "status") || "Yayında",
-    shortDesc: str(formData, "shortDesc"),
-    content: str(formData, "content"),
-    accent: str(formData, "accent") || "#0f8ea8",
-    year: maybeNumber(formData, "year") || null,
-    liveUrl: str(formData, "liveUrl"),
-    isFeatured: bool(formData, "isFeatured"),
-    isPublished: bool(formData, "isPublished"),
-    sortOrder: maybeNumber(formData, "sortOrder"),
-    seoTitle: str(formData, "seoTitle"),
-    seoDescription: str(formData, "seoDescription")
-  };
-  if (id) await prisma.project.update({ where: { id }, data });
-  else await prisma.project.create({ data });
-  revalidatePath("/");
-  redirect("/admin/projects?saved=1");
-}
-
 export async function saveFeature(formData: FormData) {
   await requireAdmin();
   const id = str(formData, "id");
@@ -422,7 +362,7 @@ export async function saveFeature(formData: FormData) {
     category: str(formData, "category") || "Genel",
     visualType: str(formData, "visualType") || "icon",
     visualImage: optional(formData, "visualImage"),
-    visualAccent: optional(formData, "visualAccent") ?? "#B87333",
+    visualAccent: optional(formData, "visualAccent") ?? "#2563EB",
     shortDesc: str(formData, "shortDesc"),
     content: str(formData, "content"),
     isPublished: bool(formData, "isPublished"),
@@ -447,7 +387,7 @@ export async function saveSolutionCard(formData: FormData) {
     brands: optional(formData, "brands"),
     icon: optional(formData, "icon"),
     visualImage: optional(formData, "visualImage"),
-    visualAccent: optional(formData, "visualAccent") ?? "#B87333",
+    visualAccent: optional(formData, "visualAccent") ?? "#2563EB",
     isPublished: bool(formData, "isPublished"),
     sortOrder: maybeNumber(formData, "sortOrder")
   };
@@ -503,6 +443,61 @@ export async function savePost(formData: FormData) {
   if (id) await prisma.post.update({ where: { id }, data });
   else await prisma.post.create({ data });
   revalidatePath("/");
+  revalidatePath("/blog");
+  redirect("/admin/blog?saved=1");
+}
+
+export async function deletePost(formData: FormData) {
+  await requireAdmin();
+  const id = str(formData, "id");
+  if (id) await prisma.post.delete({ where: { id } });
+  revalidatePath("/");
+  revalidatePath("/blog");
+  redirect("/admin/blog?deleted=1");
+}
+
+export async function uploadPostImage(formData: FormData) {
+  await requireAdmin();
+  const id = str(formData, "id");
+  const file = formData.get("file");
+  if (!id) redirect("/admin/blog?error=Yazı+ID+yok");
+  if (!(file instanceof File) || file.size === 0) {
+    redirect("/admin/blog?error=Dosya+seçilmedi");
+  }
+  if (file.size > MAX_UPLOAD_BYTES) {
+    redirect("/admin/blog?error=Dosya+10MB%27dan+büyük+olamaz");
+  }
+  if (!ALLOWED_IMAGE_TYPES.has(file.type)) {
+    redirect("/admin/blog?error=Sadece+jpg%2C+png%2C+webp%2C+gif+veya+svg+yüklenebilir");
+  }
+
+  const post = await prisma.post.findUnique({ where: { id } });
+  if (!post) redirect("/admin/blog?error=Yazı+bulunamadı");
+
+  const ext = file.name.includes(".") ? file.name.split(".").pop()!.toLowerCase().replace(/[^a-z0-9]/g, "") : "img";
+  const filename = `${post.slug}-${Date.now()}.${ext || "img"}`;
+  const uploadDir = path.join(process.cwd(), "public", "uploads", "blog");
+  await mkdir(uploadDir, { recursive: true });
+  const buffer = Buffer.from(await file.arrayBuffer());
+  await writeFile(path.join(uploadDir, filename), buffer);
+
+  await prisma.post.update({
+    where: { id },
+    data: { coverImage: `/uploads/blog/${filename}` }
+  });
+  revalidatePath("/");
+  revalidatePath("/blog");
+  redirect("/admin/blog?saved=1");
+}
+
+export async function clearPostImage(formData: FormData) {
+  await requireAdmin();
+  const id = str(formData, "id");
+  if (id) {
+    await prisma.post.update({ where: { id }, data: { coverImage: null } });
+  }
+  revalidatePath("/");
+  revalidatePath("/blog");
   redirect("/admin/blog?saved=1");
 }
 
@@ -513,4 +508,397 @@ export async function updateOffer(formData: FormData) {
     data: { status: str(formData, "status"), internalNote: str(formData, "internalNote"), isRead: true }
   });
   redirect("/admin/offers?saved=1");
+}
+
+// =====================================================================
+// FAZ 1 — Anasayfa dynamic content actions
+// =====================================================================
+
+export async function saveBusinessModelCard(formData: FormData) {
+  await requireAdmin();
+  const id = str(formData, "id");
+  const data = {
+    slug: str(formData, "slug"),
+    badge: str(formData, "badge"),
+    title: str(formData, "title"),
+    description: str(formData, "description"),
+    bullets: str(formData, "bullets"),
+    href: str(formData, "href") || "/",
+    color: str(formData, "color") || "blue",
+    image: optional(formData, "image"),
+    isPublished: bool(formData, "isPublished"),
+    sortOrder: maybeNumber(formData, "sortOrder")
+  };
+  if (id) await prisma.businessModelCard.update({ where: { id }, data });
+  else await prisma.businessModelCard.create({ data });
+  revalidatePath("/");
+  redirect("/admin/business-models?saved=1");
+}
+
+export async function deleteBusinessModelCard(formData: FormData) {
+  await requireAdmin();
+  const id = str(formData, "id");
+  if (id) await prisma.businessModelCard.delete({ where: { id } });
+  revalidatePath("/");
+  redirect("/admin/business-models?deleted=1");
+}
+
+export async function saveHomeStat(formData: FormData) {
+  await requireAdmin();
+  const id = str(formData, "id");
+  const data = {
+    value: str(formData, "value"),
+    label: str(formData, "label"),
+    isPublished: bool(formData, "isPublished"),
+    sortOrder: maybeNumber(formData, "sortOrder")
+  };
+  if (id) await prisma.homeStat.update({ where: { id }, data });
+  else await prisma.homeStat.create({ data });
+  revalidatePath("/");
+  redirect("/admin/home-stats?saved=1");
+}
+
+export async function deleteHomeStat(formData: FormData) {
+  await requireAdmin();
+  const id = str(formData, "id");
+  if (id) await prisma.homeStat.delete({ where: { id } });
+  revalidatePath("/");
+  redirect("/admin/home-stats?deleted=1");
+}
+
+export async function savePlatformShowcaseCard(formData: FormData) {
+  await requireAdmin();
+  const id = str(formData, "id");
+  const data = {
+    slug: str(formData, "slug"),
+    label: str(formData, "label"),
+    title: str(formData, "title"),
+    description: str(formData, "description"),
+    image: str(formData, "image"),
+    bullets: str(formData, "bullets"),
+    isPublished: bool(formData, "isPublished"),
+    sortOrder: maybeNumber(formData, "sortOrder")
+  };
+  if (id) await prisma.platformShowcaseCard.update({ where: { id }, data });
+  else await prisma.platformShowcaseCard.create({ data });
+  revalidatePath("/");
+  redirect("/admin/platform-showcase?saved=1");
+}
+
+export async function deletePlatformShowcaseCard(formData: FormData) {
+  await requireAdmin();
+  const id = str(formData, "id");
+  if (id) await prisma.platformShowcaseCard.delete({ where: { id } });
+  revalidatePath("/");
+  redirect("/admin/platform-showcase?deleted=1");
+}
+
+export async function saveIntegrationGroup(formData: FormData) {
+  await requireAdmin();
+  const id = str(formData, "id");
+  const data = {
+    slug: str(formData, "slug"),
+    title: str(formData, "title"),
+    description: optional(formData, "description"),
+    isPublished: bool(formData, "isPublished"),
+    sortOrder: maybeNumber(formData, "sortOrder")
+  };
+  if (id) await prisma.integrationGroup.update({ where: { id }, data });
+  else await prisma.integrationGroup.create({ data });
+  revalidatePath("/");
+  revalidatePath("/ozellikler");
+  redirect("/admin/integrations?saved=1");
+}
+
+export async function deleteIntegrationGroup(formData: FormData) {
+  await requireAdmin();
+  const id = str(formData, "id");
+  if (id) await prisma.integrationGroup.delete({ where: { id } });
+  revalidatePath("/");
+  revalidatePath("/ozellikler");
+  redirect("/admin/integrations?deleted=1");
+}
+
+export async function saveIntegration(formData: FormData) {
+  await requireAdmin();
+  const id = str(formData, "id");
+  const groupId = str(formData, "groupId");
+  if (!groupId) redirect("/admin/integrations?error=Grup+seçilmedi");
+  const data = {
+    groupId,
+    name: str(formData, "name"),
+    description: optional(formData, "description"),
+    logo: optional(formData, "logo"),
+    isPublished: bool(formData, "isPublished"),
+    sortOrder: maybeNumber(formData, "sortOrder")
+  };
+  if (id) await prisma.integration.update({ where: { id }, data });
+  else await prisma.integration.create({ data });
+  revalidatePath("/");
+  revalidatePath("/ozellikler");
+  redirect("/admin/integrations?saved=1");
+}
+
+export async function deleteIntegration(formData: FormData) {
+  await requireAdmin();
+  const id = str(formData, "id");
+  if (id) await prisma.integration.delete({ where: { id } });
+  revalidatePath("/");
+  revalidatePath("/ozellikler");
+  redirect("/admin/integrations?deleted=1");
+}
+
+// =====================================================================
+// FAZ 2 — /b2b /b2c /c2c sayfa içerikleri actions
+// =====================================================================
+
+export async function saveBusinessModelPage(formData: FormData) {
+  await requireAdmin();
+  const id = str(formData, "id");
+  const data = {
+    slug: str(formData, "slug"),
+    badge: str(formData, "badge"),
+    title: str(formData, "title"),
+    highlight: str(formData, "highlight"),
+    description: str(formData, "description"),
+    primaryCtaLabel: str(formData, "primaryCtaLabel"),
+    primaryCtaHref: str(formData, "primaryCtaHref"),
+    audience: str(formData, "audience"),
+    integrationsCopy: str(formData, "integrationsCopy"),
+    ctaTitle: str(formData, "ctaTitle"),
+    ctaDescription: str(formData, "ctaDescription"),
+    isPublished: bool(formData, "isPublished")
+  };
+  if (id) await prisma.businessModelPage.update({ where: { id }, data });
+  else await prisma.businessModelPage.create({ data });
+  revalidatePath("/b2b");
+  revalidatePath("/b2c");
+  revalidatePath("/c2c");
+  redirect(`/admin/business-pages/${data.slug}?saved=1`);
+}
+
+export async function saveBusinessModelHighlight(formData: FormData) {
+  await requireAdmin();
+  const id = str(formData, "id");
+  const pageId = str(formData, "pageId");
+  const slug = str(formData, "slug");
+  if (!pageId) redirect("/admin/business-pages?error=Sayfa+seçilmedi");
+  const data = {
+    pageId,
+    icon: str(formData, "icon"),
+    title: str(formData, "title"),
+    description: str(formData, "description"),
+    sortOrder: maybeNumber(formData, "sortOrder")
+  };
+  if (id) await prisma.businessModelHighlight.update({ where: { id }, data });
+  else await prisma.businessModelHighlight.create({ data });
+  revalidatePath(`/${slug}`);
+  redirect(`/admin/business-pages/${slug}?saved=1`);
+}
+
+export async function deleteBusinessModelHighlight(formData: FormData) {
+  await requireAdmin();
+  const id = str(formData, "id");
+  const slug = str(formData, "slug");
+  if (id) await prisma.businessModelHighlight.delete({ where: { id } });
+  revalidatePath(`/${slug}`);
+  redirect(`/admin/business-pages/${slug}?deleted=1`);
+}
+
+export async function saveBusinessModelUseCase(formData: FormData) {
+  await requireAdmin();
+  const id = str(formData, "id");
+  const pageId = str(formData, "pageId");
+  const slug = str(formData, "slug");
+  if (!pageId) redirect("/admin/business-pages?error=Sayfa+seçilmedi");
+  const data = {
+    pageId,
+    industry: str(formData, "industry"),
+    scenario: str(formData, "scenario"),
+    outcome: str(formData, "outcome"),
+    sortOrder: maybeNumber(formData, "sortOrder")
+  };
+  if (id) await prisma.businessModelUseCase.update({ where: { id }, data });
+  else await prisma.businessModelUseCase.create({ data });
+  revalidatePath(`/${slug}`);
+  redirect(`/admin/business-pages/${slug}?saved=1`);
+}
+
+export async function deleteBusinessModelUseCase(formData: FormData) {
+  await requireAdmin();
+  const id = str(formData, "id");
+  const slug = str(formData, "slug");
+  if (id) await prisma.businessModelUseCase.delete({ where: { id } });
+  revalidatePath(`/${slug}`);
+  redirect(`/admin/business-pages/${slug}?deleted=1`);
+}
+
+export async function saveBusinessModelMetric(formData: FormData) {
+  await requireAdmin();
+  const id = str(formData, "id");
+  const pageId = str(formData, "pageId");
+  const slug = str(formData, "slug");
+  if (!pageId) redirect("/admin/business-pages?error=Sayfa+seçilmedi");
+  const data = {
+    pageId,
+    value: str(formData, "value"),
+    label: str(formData, "label"),
+    sortOrder: maybeNumber(formData, "sortOrder")
+  };
+  if (id) await prisma.businessModelMetric.update({ where: { id }, data });
+  else await prisma.businessModelMetric.create({ data });
+  revalidatePath(`/${slug}`);
+  redirect(`/admin/business-pages/${slug}?saved=1`);
+}
+
+export async function deleteBusinessModelMetric(formData: FormData) {
+  await requireAdmin();
+  const id = str(formData, "id");
+  const slug = str(formData, "slug");
+  if (id) await prisma.businessModelMetric.delete({ where: { id } });
+  revalidatePath(`/${slug}`);
+  redirect(`/admin/business-pages/${slug}?deleted=1`);
+}
+
+// =====================================================================
+// FAZ 3 — Static pages, Job roles, Footer links actions
+// =====================================================================
+
+export async function saveStaticPage(formData: FormData) {
+  await requireAdmin();
+  const slug = str(formData, "slug");
+  const data = {
+    heroEyebrow: optional(formData, "heroEyebrow"),
+    heroTitle: str(formData, "heroTitle"),
+    heroHighlight: optional(formData, "heroHighlight"),
+    heroDescription: str(formData, "heroDescription"),
+    heroCtaLabel: optional(formData, "heroCtaLabel"),
+    heroCtaHref: optional(formData, "heroCtaHref"),
+    heroCtaSecondaryLabel: optional(formData, "heroCtaSecondaryLabel"),
+    heroCtaSecondaryHref: optional(formData, "heroCtaSecondaryHref"),
+    bodyTitle: optional(formData, "bodyTitle"),
+    bodyContent: optional(formData, "bodyContent"),
+    proofTitle: optional(formData, "proofTitle"),
+    proofItems: optional(formData, "proofItems"),
+    visualImage: optional(formData, "visualImage"),
+    stats: optional(formData, "stats"),
+    ctaEyebrow: optional(formData, "ctaEyebrow"),
+    ctaTitle: optional(formData, "ctaTitle"),
+    ctaDescription: optional(formData, "ctaDescription"),
+    ctaLabel: optional(formData, "ctaLabel"),
+    ctaHref: optional(formData, "ctaHref"),
+    seoTitle: optional(formData, "seoTitle"),
+    seoDescription: optional(formData, "seoDescription"),
+    isPublished: bool(formData, "isPublished")
+  };
+  await prisma.staticPage.upsert({
+    where: { slug },
+    update: data,
+    create: { slug, ...data }
+  });
+  revalidatePath(`/${slug}`);
+  redirect(`/admin/static-pages/${slug}?saved=1`);
+}
+
+export async function saveJobRole(formData: FormData) {
+  await requireAdmin();
+  const id = str(formData, "id");
+  const data = {
+    title: str(formData, "title"),
+    icon: optional(formData, "icon"),
+    description: str(formData, "description"),
+    department: optional(formData, "department"),
+    location: optional(formData, "location"),
+    type: optional(formData, "type"),
+    applyUrl: optional(formData, "applyUrl"),
+    isPublished: bool(formData, "isPublished"),
+    sortOrder: maybeNumber(formData, "sortOrder")
+  };
+  if (id) await prisma.jobRole.update({ where: { id }, data });
+  else await prisma.jobRole.create({ data });
+  revalidatePath("/kariyer");
+  redirect("/admin/job-roles?saved=1");
+}
+
+export async function deleteJobRole(formData: FormData) {
+  await requireAdmin();
+  const id = str(formData, "id");
+  if (id) await prisma.jobRole.delete({ where: { id } });
+  revalidatePath("/kariyer");
+  redirect("/admin/job-roles?deleted=1");
+}
+
+export async function saveFooterLink(formData: FormData) {
+  await requireAdmin();
+  const id = str(formData, "id");
+  const data = {
+    groupSlug: str(formData, "groupSlug"),
+    groupLabel: str(formData, "groupLabel"),
+    label: str(formData, "label"),
+    href: str(formData, "href"),
+    isPublished: bool(formData, "isPublished"),
+    sortOrder: maybeNumber(formData, "sortOrder")
+  };
+  if (id) await prisma.footerLink.update({ where: { id }, data });
+  else await prisma.footerLink.create({ data });
+  revalidatePath("/");
+  redirect("/admin/footer-links?saved=1");
+}
+
+export async function deleteFooterLink(formData: FormData) {
+  await requireAdmin();
+  const id = str(formData, "id");
+  if (id) await prisma.footerLink.delete({ where: { id } });
+  revalidatePath("/");
+  redirect("/admin/footer-links?deleted=1");
+}
+
+// =====================================================================
+// Solution card image upload
+// =====================================================================
+
+export async function uploadSolutionCardImage(formData: FormData) {
+  await requireAdmin();
+  const id = str(formData, "id");
+  const file = formData.get("file");
+  if (!id) redirect("/admin/solution-cards?error=Kart+ID+yok");
+  if (!(file instanceof File) || file.size === 0) {
+    redirect("/admin/solution-cards?error=Dosya+seçilmedi");
+  }
+  if (file.size > MAX_UPLOAD_BYTES) {
+    redirect("/admin/solution-cards?error=Dosya+10MB%27dan+büyük+olamaz");
+  }
+  if (!ALLOWED_IMAGE_TYPES.has(file.type)) {
+    redirect("/admin/solution-cards?error=Sadece+jpg%2C+png%2C+webp%2C+gif+veya+svg+yüklenebilir");
+  }
+
+  const card = await prisma.solutionCard.findUnique({ where: { id } });
+  if (!card) redirect("/admin/solution-cards?error=Kart+bulunamadı");
+
+  const ext = file.name.includes(".") ? file.name.split(".").pop()!.toLowerCase().replace(/[^a-z0-9]/g, "") : "img";
+  const filename = `${card.slug}-${Date.now()}.${ext || "img"}`;
+  const uploadDir = path.join(process.cwd(), "public", "uploads", "solutions");
+  await mkdir(uploadDir, { recursive: true });
+  const buffer = Buffer.from(await file.arrayBuffer());
+  await writeFile(path.join(uploadDir, filename), buffer);
+
+  await prisma.solutionCard.update({
+    where: { id },
+    data: { visualImage: `/uploads/solutions/${filename}` }
+  });
+  revalidatePath("/");
+  revalidatePath("/ozellikler");
+  revalidatePath(`/ozellikler/${card.slug}`);
+  redirect("/admin/solution-cards?saved=1");
+}
+
+export async function clearSolutionCardImage(formData: FormData) {
+  await requireAdmin();
+  const id = str(formData, "id");
+  if (id) {
+    await prisma.solutionCard.update({ where: { id }, data: { visualImage: null } });
+  }
+  revalidatePath("/");
+  revalidatePath("/ozellikler");
+  redirect("/admin/solution-cards?saved=1");
 }

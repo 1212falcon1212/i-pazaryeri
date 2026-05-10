@@ -11,28 +11,6 @@ export const getSettings = cache(async () => {
   return settings;
 });
 
-export const getFeaturedProjects = cache(() =>
-  prisma.project.findMany({
-    where: { isPublished: true, isFeatured: true },
-    orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }]
-  })
-);
-
-export function publishedProjectArgs() {
-  return {
-    where: { isPublished: true },
-    orderBy: [{ sortOrder: "asc" as const }, { createdAt: "desc" as const }]
-  };
-}
-
-export const getProjects = cache(() =>
-  prisma.project.findMany(publishedProjectArgs())
-);
-
-export const getProject = cache((slug: string) =>
-  prisma.project.findFirst({ where: { slug, isPublished: true } })
-);
-
 export function publishedFeatureArgs() {
   return {
     where: { isPublished: true },
@@ -180,6 +158,81 @@ export const getRelatedPosts = cache(async (slug: string, tag: string | null, li
 export const getFeaturedTestimonial = cache(() =>
   prisma.testimonial.findFirst({
     where: { isPublished: true, isFeatured: true },
+    orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }]
+  })
+);
+
+// =====================================================================
+// FAZ 1 — Anasayfa hardcoded içerik DB'den çekiliyor
+// =====================================================================
+
+export const getBusinessModelCards = cache(() =>
+  prisma.businessModelCard.findMany({
+    where: { isPublished: true },
+    orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }]
+  })
+);
+
+export const getHomeStats = cache(() =>
+  prisma.homeStat.findMany({
+    where: { isPublished: true },
+    orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }]
+  })
+);
+
+export const getPlatformShowcaseCards = cache(() =>
+  prisma.platformShowcaseCard.findMany({
+    where: { isPublished: true },
+    orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }]
+  })
+);
+
+export const getIntegrationGroups = cache(() =>
+  prisma.integrationGroup.findMany({
+    where: { isPublished: true },
+    orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+    include: {
+      items: {
+        where: { isPublished: true },
+        orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }]
+      }
+    }
+  })
+);
+
+// =====================================================================
+// FAZ 2 — /b2b /b2c /c2c sayfa içerikleri DB'den
+// =====================================================================
+
+export const getBusinessModelPage = cache(async (slug: string) =>
+  prisma.businessModelPage.findFirst({
+    where: { slug, isPublished: true },
+    include: {
+      highlights: { orderBy: { sortOrder: "asc" } },
+      useCases: { orderBy: { sortOrder: "asc" } },
+      metrics: { orderBy: { sortOrder: "asc" } }
+    }
+  })
+);
+
+// =====================================================================
+// FAZ 3 — Statik sayfalar + Footer + Job roles
+// =====================================================================
+
+export const getStaticPage = cache(async (slug: string) =>
+  prisma.staticPage.findFirst({ where: { slug, isPublished: true } })
+);
+
+export const getJobRoles = cache(() =>
+  prisma.jobRole.findMany({
+    where: { isPublished: true },
+    orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }]
+  })
+);
+
+export const getFooterLinks = cache(() =>
+  prisma.footerLink.findMany({
+    where: { isPublished: true },
     orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }]
   })
 );

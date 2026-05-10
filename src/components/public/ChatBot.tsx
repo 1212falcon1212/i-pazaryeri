@@ -16,16 +16,8 @@ export type ChatPackage = {
   pricePeriod: string | null;
 };
 
-export type ChatProject = {
-  slug: string;
-  title: string;
-  shortDesc: string;
-  sector: string;
-};
-
 type Props = {
   packages: ChatPackage[];
-  projects: ChatProject[];
 };
 
 // ---------- Internal message types ----------
@@ -65,7 +57,7 @@ type IntentKey =
   | "what-is-b2b"
   | "advantages"
   | "packages"
-  | "projects"
+  | "demo"
   | "erp"
   | "go-live"
   | "kvkk"
@@ -98,12 +90,12 @@ function buildIntent(key: IntentKey, ctx: Props): BotBubble {
         id,
         role: "bot",
         ts,
-        text: "Merhaba! Ben i-Pazaryeri asistanıyım. B2B pazaryeri yazılımı, paketler veya projelerimiz hakkında size nasıl yardımcı olabilirim?",
+        text: "Merhaba! Ben i-Pazaryeri asistanıyım. B2B pazaryeri yazılımı, paketlerimiz veya size özel demo hakkında nasıl yardımcı olabilirim?",
         quickReplies: [
           { label: "B2B pazaryeri nedir?", next: "what-is-b2b" },
           { label: "B2B'nin avantajları", next: "advantages" },
           { label: "Paketleri görmek istiyorum", next: "packages" },
-          { label: "Çalışan projeler", next: "projects" },
+          { label: "Demo görmek istiyorum", next: "demo" },
           { label: "Bir uzmanla görüşmek istiyorum", next: "contact-intro" }
         ]
       };
@@ -132,7 +124,7 @@ function buildIntent(key: IntentKey, ctx: Props): BotBubble {
           "B2B pazaryerinin getirileri:\n\n• Manuel sipariş alma yükü %70'in üzerinde azalır\n• Sipariş hatası neredeyse sıfırlanır\n• Bayi sipariş sıklığı artar (ortalama AOV yükselir)\n• ERP'ye otomatik veri akışı; muhasebe yükü düşer\n• Saha satış ekibi rapor/sipariş işleme yerine müşteriye odaklanır\n• Kampanya ve fiyat kuralları tek panelden yönetilir",
         quickReplies: [
           { label: "Paketleri görelim", next: "packages" },
-          { label: "Çalışan projeler", next: "projects" },
+          { label: "Demo görmek istiyorum", next: "demo" },
           { label: "ERP entegrasyonu nasıl çalışır?", next: "erp" },
           { label: "Teklif al", next: "contact-intro" }
         ]
@@ -158,35 +150,24 @@ function buildIntent(key: IntentKey, ctx: Props): BotBubble {
         quickReplies: [
           { label: "Tüm paketler sayfası", next: "external", href: "/paketler" },
           { label: "Bana özel teklif istiyorum", next: "contact-intro" },
-          { label: "Çalışan projeler", next: "projects" }
+          { label: "Demo görmek istiyorum", next: "demo" }
         ]
       };
     }
 
-    case "projects": {
-      const top = ctx.projects.slice(0, 3);
-      const cards = top.map((p) => ({
-        title: p.title,
-        subtitle: p.sector,
-        body: p.shortDesc,
-        href: `/projeler/${p.slug}`,
-        cta: "Projeyi incele"
-      }));
+    case "demo":
       return {
         id,
         role: "bot",
         ts,
-        text: top.length
-          ? `Yayınlanmış ${ctx.projects.length} referans projemiz var. Birkaç öne çıkan örnek:`
-          : "Projeler yakında eklenecek.",
-        cards: cards.length > 0 ? cards : undefined,
+        text:
+          "Sektörünüze özel canlı demo seansı planlıyoruz. Demo'da:\n\n• Bayi paneli ve sipariş akışı\n• Admin panel & yönetim ekranları\n• ERP / kargo / ödeme entegrasyonları\n• Sektörünüze özel modüller\n\nbirebir gösterilir, sorularınızı anında cevaplarız. Formu doldurun, 1 iş günü içinde uygun saati birlikte belirleyelim.",
         quickReplies: [
-          { label: "Tüm projeler", next: "external", href: "/projeler" },
-          { label: "Sektörüme özel teklif", next: "contact-intro" },
-          { label: "Paketleri gör", next: "packages" }
+          { label: "Demo için formu aç", next: "contact-intro" },
+          { label: "Önce paketleri göreyim", next: "packages" },
+          { label: "Özelliklere bakacağım", next: "external", href: "/ozellikler" }
         ]
       };
-    }
 
     case "erp":
       return {
@@ -247,7 +228,7 @@ const TOPIC_LABEL: Record<IntentKey, string> = {
   "what-is-b2b": "B2B nedir",
   advantages: "B2B avantajları",
   packages: "Paketler",
-  projects: "Projeler",
+  demo: "Demo talebi",
   erp: "ERP entegrasyonu",
   "go-live": "Canlıya geçiş süresi",
   kvkk: "KVKK & güvenlik",
@@ -260,7 +241,7 @@ function uid() {
 
 // ---------- Component ----------
 
-export function ChatBot({ packages, projects }: Props) {
+export function ChatBot({ packages }: Props) {
   const [open, setOpen] = useState(false);
   const [hasUnread, setHasUnread] = useState(true); // pulse the launcher first time
   const [bubbles, setBubbles] = useState<Bubble[]>([]);
@@ -274,7 +255,7 @@ export function ChatBot({ packages, projects }: Props) {
   // Initialize with greeting on first open
   useEffect(() => {
     if (open && bubbles.length === 0) {
-      const greeting = buildIntent("greeting", { packages, projects });
+      const greeting = buildIntent("greeting", { packages });
       setBubbles([greeting]);
       setTopics(["greeting"]);
     }
@@ -296,7 +277,7 @@ export function ChatBot({ packages, projects }: Props) {
       ts: new Date().toISOString(),
       text: userLabel
     };
-    const botBubble = buildIntent(intent, { packages, projects });
+    const botBubble = buildIntent(intent, { packages });
     setBubbles((prev) => [...prev, userBubble, botBubble]);
     setTopics((prev) => (prev.includes(intent) ? prev : [...prev, intent]));
   }

@@ -1,99 +1,158 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, CheckCircle2 } from "lucide-react";
+import { notFound } from "next/navigation";
+import { ArrowRight, CheckCircle2, Sparkles } from "lucide-react";
 import { PublicShell } from "@/components/public/PublicShell";
+import { getStaticPage } from "@/lib/content";
 
-export const metadata: Metadata = {
-  title: "Hakkımızda | i-Pazaryeri B2B Pazaryeri Yazılımı",
-  description:
-    "i-Pazaryeri, i-Hırdavat, i-Kırtasiye ve i-Depo gibi çalışan sistemlerden gelen B2B pazaryeri yazılımı deneyimini ürünleşmiş altyapıya dönüştürür."
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const page = await getStaticPage("hakkimizda");
+  return {
+    title: page?.seoTitle ?? "Hakkımızda | i-Pazaryeri",
+    description: page?.seoDescription ?? undefined
+  };
+}
 
-const proofItems = [
-  "Laravel 12, React ve Filament tabanlı çalışan altyapı",
-  "ERP, kargo, ödeme, bildirim ve admin panel süreçleri",
-  "Bayi, satıcı, tedarikçi ve kurumsal alıcı rollerine uyarlanabilir yapı"
-];
+function safeParseJsonArray<T = unknown>(value: string | null): T[] {
+  if (!value) return [];
+  try {
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
 
-const stats = [
-  ["3+", "çalışan sistem ailesi"],
-  ["7", "ERP ve muhasebe bağlantısı"],
-  ["9", "kargo sağlayıcı kurgusu"]
-];
+function splitParagraphs(value: string | null): string[] {
+  if (!value) return [];
+  return value
+    .split(/\n{2,}/)
+    .map((p) => p.trim())
+    .filter(Boolean);
+}
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const page = await getStaticPage("hakkimizda");
+  if (!page) notFound();
+
+  const proofItems = safeParseJsonArray<string>(page.proofItems);
+  const stats = safeParseJsonArray<{ value: string; label: string }>(page.stats);
+  const paragraphs = splitParagraphs(page.bodyContent);
+
   return (
     <PublicShell>
-      <main>
-        <section className="about-hero">
-          <div className="container about-hero-grid">
-            <div className="about-copy">
-              <span className="clean-eyebrow">Hakkımızda</span>
-              <h1>Çalışan B2B sistemlerden ürünleşmiş pazaryeri altyapısına.</h1>
-              <p>
-                i-Pazaryeri, bayi ağı olan şirketlerin ürün, fiyat, stok, sipariş, ERP, kargo ve ödeme süreçlerini
-                tek dijital altyapıda yönetebilmesi için geliştirilen B2B pazaryeri yazılımıdır.
-              </p>
-              <div className="about-actions">
-                <Link className="btn btn-accent btn-lg" href="/teklif-al">
-                  Projenizi konuşalım <ArrowRight size={16} />
+      <main className="about-page home">
+        <section className="features-hero">
+          <div className="container">
+            <span className="hero-eyebrow">
+              <Sparkles size={14} /> {page.heroEyebrow ?? "Hakkımızda"}
+            </span>
+            <h1 className="features-hero-title">
+              {page.heroTitle}{" "}
+              {page.heroHighlight ? (
+                <span className="hero-title-highlight">{page.heroHighlight}</span>
+              ) : null}
+            </h1>
+            <p className="features-hero-description">{page.heroDescription}</p>
+            {page.heroCtaLabel && page.heroCtaHref ? (
+              <div className="hero-actions">
+                <Link className="btn btn-primary btn-lg" href={page.heroCtaHref}>
+                  {page.heroCtaLabel} <ArrowRight size={16} />
                 </Link>
-                <Link className="btn btn-soft btn-lg" href="/projeler">
-                  Projeleri gör
-                </Link>
+                {page.heroCtaSecondaryLabel && page.heroCtaSecondaryHref ? (
+                  <Link className="btn btn-ghost btn-lg" href={page.heroCtaSecondaryHref}>
+                    {page.heroCtaSecondaryLabel}
+                  </Link>
+                ) : null}
               </div>
-            </div>
-            <div className="about-visual">
-              <Image
-                src="/uploads/hero-marketplace-forest-copper-v2.png"
-                alt="i-Pazaryeri B2B altyapı görseli"
-                fill
-                sizes="(max-width: 980px) 100vw, 50vw"
-                priority
-              />
-            </div>
+            ) : null}
           </div>
         </section>
 
-        <section className="section">
-          <div className="container about-content-grid">
-            <article className="about-main-card">
-              <h2>Biz ne yapıyoruz?</h2>
-              <p>
-                B2B pazaryeri kurmak isteyen işletmelerin en büyük problemi yalnızca web sitesi tasarımı değildir.
-                Bayi fiyatları, cari yapı, stok görünürlüğü, sipariş onayları, ERP senkronizasyonu, kargo takibi,
-                ödeme ve komisyon akışları aynı anda doğru çalışmalıdır. i-Pazaryeri bu operasyonu hazır bir çekirdek
-                üzerinden sektörünüze uyarlamak için geliştirilmiştir.
-              </p>
-              <p>
-                i-Hırdavat, i-Kırtasiye ve i-Depo gibi sistemlerde kullanılan backend yaklaşımı; farklı sektörlerin
-                bayi, tedarikçi, doğrulama ve entegrasyon ihtiyaçlarını tek mimari disiplin altında ele alır. Bu sayede
-                sıfırdan yazılım riskini azaltırken özel iş kurallarınızı koruyan bir yapı kurabiliriz.
-              </p>
-            </article>
-            <aside className="about-proof-card">
-              <h3>Altyapı odağımız</h3>
-              {proofItems.map((item) => (
-                <div className="about-proof-line" key={item}>
-                  <CheckCircle2 size={18} />
-                  <span>{item}</span>
+        {paragraphs.length > 0 || proofItems.length > 0 ? (
+          <section className="about-content-section">
+            <div className="container about-content-v2">
+              <article className="about-main-v2">
+                {paragraphs.map((p, i) => {
+                  if (p.startsWith("## ")) {
+                    return <h2 key={i}>{p.slice(3)}</h2>;
+                  }
+                  if (i === 0 && page.bodyTitle) {
+                    return (
+                      <div key={i}>
+                        <h2>{page.bodyTitle}</h2>
+                        <p>{p}</p>
+                      </div>
+                    );
+                  }
+                  return <p key={i}>{p}</p>;
+                })}
+              </article>
+              {proofItems.length > 0 ? (
+                <aside className="about-proof-v2">
+                  {page.proofTitle ? <h3>{page.proofTitle}</h3> : null}
+                  <ul>
+                    {proofItems.map((item) => (
+                      <li key={item}>
+                        <CheckCircle2 size={18} />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  {page.visualImage ? (
+                    <div className="about-visual-v2">
+                      <Image
+                        src={page.visualImage}
+                        alt={page.heroTitle}
+                        fill
+                        sizes="(max-width: 980px) 100vw, 360px"
+                      />
+                    </div>
+                  ) : null}
+                </aside>
+              ) : null}
+            </div>
+          </section>
+        ) : null}
+
+        {stats.length > 0 ? (
+          <section className="about-stats-v2-section">
+            <div className="container">
+              <div className="about-stats-v2-grid">
+                {stats.map((s) => (
+                  <div className="metric-card" key={s.label}>
+                    <strong>{s.value}</strong>
+                    <span>{s.label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        ) : null}
+
+        {page.ctaTitle ? (
+          <section className="final-cta-section">
+            <div className="container">
+              <div className="final-cta-card">
+                <div className="final-cta-copy">
+                  <span className="final-cta-eyebrow">
+                    <Sparkles size={14} /> {page.ctaEyebrow ?? "Birlikte planlayalım"}
+                  </span>
+                  <h2>{page.ctaTitle}</h2>
+                  {page.ctaDescription ? <p>{page.ctaDescription}</p> : null}
+                  {page.ctaLabel && page.ctaHref ? (
+                    <div className="final-cta-actions">
+                      <Link className="btn btn-primary btn-lg" href={page.ctaHref}>
+                        {page.ctaLabel} <ArrowRight size={16} />
+                      </Link>
+                    </div>
+                  ) : null}
                 </div>
-              ))}
-            </aside>
-          </div>
-        </section>
-
-        <section className="about-stats-section">
-          <div className="container about-stats">
-            {stats.map(([value, label]) => (
-              <div key={label}>
-                <strong>{value}</strong>
-                <span>{label}</span>
               </div>
-            ))}
-          </div>
-        </section>
+            </div>
+          </section>
+        ) : null}
       </main>
     </PublicShell>
   );

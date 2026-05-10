@@ -100,6 +100,28 @@ export default async function SettingsPage({ searchParams }: Props) {
           <TextAreaField label="Hero açıklama (yedek)" name="heroDescription" defaultValue={s.heroDescription} required />
         </div>
 
+        <h2>Anasayfa Hero (rotator + checklist)</h2>
+        <p className="muted" style={{ marginTop: -10, fontSize: 13 }}>
+          Anasayfa hero bölümündeki metinler. Rotator kelimeleri ve checklist için JSON array formatı: <code>[&quot;Madde 1&quot;, &quot;Madde 2&quot;]</code>
+        </p>
+        <div className="form-grid">
+          <TextField label="Hero eyebrow (rozet üst metni)" name="heroEyebrow" defaultValue={s.heroEyebrow} />
+          <TextField label="Rotator kelimeleri (JSON)" name="heroRotatingWords" defaultValue={s.heroRotatingWords} />
+          <TextField label="Title — başlangıç kelimesi (örn. İster)" name="heroTitleLead" defaultValue={s.heroTitleLead} />
+          <TextField label="Title — bağlaç (örn. için —)" name="heroTitleConnector" defaultValue={s.heroTitleConnector} />
+          <TextField label="Title — vurgulu son cümle" name="heroHighlight" defaultValue={s.heroHighlight} />
+          <TextField label="Birincil CTA metni" name="heroPrimaryCta" defaultValue={s.heroPrimaryCta} />
+          <TextField label="İkincil CTA metni" name="heroSecondaryCta" defaultValue={s.heroSecondaryCta} />
+          <TextAreaField label='Checklist (JSON array, örn. ["Madde 1", "Madde 2"])' name="heroChecklist" defaultValue={s.heroChecklist} />
+        </div>
+
+        <h2>Trust strip & Entegrasyonlar bölüm metinleri (anasayfa)</h2>
+        <div className="form-grid">
+          <TextAreaField label='Trust strip etiketleri (JSON array)' name="trustTags" defaultValue={s.trustTags} />
+          <TextField label="Entegrasyonlar başlığı" name="integrationsTitle" defaultValue={s.integrationsTitle} />
+          <TextAreaField label="Entegrasyonlar açıklaması" name="integrationsDesc" defaultValue={s.integrationsDesc} />
+        </div>
+
         <h2>Özellikler sayfası (/ozellikler)</h2>
         <div className="form-grid">
           <TextAreaField label="Açıklama" name="featuresDescription" defaultValue={s.featuresDescription} required />

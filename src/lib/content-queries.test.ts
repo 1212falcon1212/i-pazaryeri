@@ -5,7 +5,6 @@ import {
   publishedHomeSectionArgs,
   publishedOfferServiceOptionArgs,
   publishedPackageArgs,
-  publishedProjectArgs,
   publishedSeoArticleArgs,
   publishedSolutionCardArgs,
   publishedSolutionCardDetailArgs
@@ -21,13 +20,6 @@ describe("content query args", () => {
 
   it("loads published feature cards in admin-defined order", () => {
     expect(publishedFeatureArgs()).toEqual({
-      where: { isPublished: true },
-      orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }]
-    });
-  });
-
-  it("loads published projects in admin-defined order", () => {
-    expect(publishedProjectArgs()).toEqual({
       where: { isPublished: true },
       orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }]
     });

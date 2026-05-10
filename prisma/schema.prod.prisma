@@ -40,34 +40,20 @@ model SiteSetting {
   contactPhone         String?
   seoTitle             String?
   seoDescription       String?  @db.Text
+  // Faz 1 — Anasayfa hero alanları
+  heroEyebrow          String?
+  heroRotatingWords    String?  @db.Text
+  heroTitleLead        String?
+  heroTitleConnector   String?
+  heroHighlight        String?
+  heroChecklist        String?  @db.Text
+  heroPrimaryCta       String?
+  heroSecondaryCta     String?
+  trustTags            String?  @db.Text
+  integrationsTitle    String?  @db.Text
+  integrationsDesc     String?  @db.Text
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
-}
-
-model Project {
-  id             String   @id @default(cuid())
-  slug           String   @unique
-  title          String
-  category       String
-  sector         String
-  status         String   @default("Yayında")
-  shortDesc      String   @db.Text
-  content        String   @db.LongText
-  coverImage     String?
-  accent         String   @default("#0f8ea8")
-  year           Int?
-  liveUrl        String?
-  isFeatured     Boolean  @default(false)
-  isPublished    Boolean  @default(true)
-  sortOrder      Int      @default(0)
-  seoTitle       String?
-  seoDescription String?  @db.Text
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-
-  @@index([isFeatured])
-  @@index([isPublished])
-  @@index([sortOrder])
 }
 
 model Feature {
@@ -304,6 +290,232 @@ model OfferServiceOption {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  @@index([isPublished])
+  @@index([sortOrder])
+}
+
+// =====================================================================
+// FAZ 1 — Anasayfa hardcoded içerik
+// =====================================================================
+
+model BusinessModelCard {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  badge       String
+  title       String   @db.Text
+  description String   @db.Text
+  bullets     String   @db.Text
+  href        String
+  color       String   @default("blue")
+  image       String?
+  isPublished Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([isPublished])
+  @@index([sortOrder])
+}
+
+model HomeStat {
+  id          String   @id @default(cuid())
+  value       String
+  label       String
+  isPublished Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([isPublished])
+  @@index([sortOrder])
+}
+
+model PlatformShowcaseCard {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  label       String
+  title       String   @db.Text
+  description String   @db.Text
+  image       String
+  bullets     String   @db.Text
+  isPublished Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([isPublished])
+  @@index([sortOrder])
+}
+
+model IntegrationGroup {
+  id          String        @id @default(cuid())
+  slug        String        @unique
+  title       String
+  description String?       @db.Text
+  icon        String?
+  isPublished Boolean       @default(true)
+  sortOrder   Int           @default(0)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  items       Integration[]
+
+  @@index([isPublished])
+  @@index([sortOrder])
+}
+
+model Integration {
+  id          String           @id @default(cuid())
+  groupId     String
+  group       IntegrationGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  name        String
+  description String?          @db.Text
+  logo        String?
+  isPublished Boolean          @default(true)
+  sortOrder   Int              @default(0)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@index([groupId])
+  @@index([isPublished])
+  @@index([sortOrder])
+}
+
+// =====================================================================
+// FAZ 2 — /b2b /b2c /c2c sayfa içerikleri
+// =====================================================================
+
+model BusinessModelPage {
+  id               String                   @id @default(cuid())
+  slug             String                   @unique
+  badge            String
+  title            String                   @db.Text
+  highlight        String                   @db.Text
+  description      String                   @db.Text
+  primaryCtaLabel  String
+  primaryCtaHref   String
+  audience         String                   @db.Text
+  integrationsCopy String                   @db.Text
+  ctaTitle         String                   @db.Text
+  ctaDescription   String                   @db.Text
+  isPublished      Boolean                  @default(true)
+  createdAt        DateTime                 @default(now())
+  updatedAt        DateTime                 @updatedAt
+  highlights       BusinessModelHighlight[]
+  useCases         BusinessModelUseCase[]
+  metrics          BusinessModelMetric[]
+
+  @@index([isPublished])
+}
+
+model BusinessModelHighlight {
+  id          String            @id @default(cuid())
+  pageId      String
+  page        BusinessModelPage @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  icon        String
+  title       String            @db.Text
+  description String            @db.Text
+  sortOrder   Int               @default(0)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@index([pageId])
+  @@index([sortOrder])
+}
+
+model BusinessModelUseCase {
+  id          String            @id @default(cuid())
+  pageId      String
+  page        BusinessModelPage @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  industry    String            @db.Text
+  scenario    String            @db.Text
+  outcome     String            @db.Text
+  sortOrder   Int               @default(0)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@index([pageId])
+  @@index([sortOrder])
+}
+
+model BusinessModelMetric {
+  id        String            @id @default(cuid())
+  pageId    String
+  page      BusinessModelPage @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  value     String
+  label     String
+  sortOrder Int               @default(0)
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
+  @@index([pageId])
+  @@index([sortOrder])
+}
+
+// =====================================================================
+// FAZ 3 — Statik sayfalar + Footer
+// =====================================================================
+
+model StaticPage {
+  id              String   @id @default(cuid())
+  slug            String   @unique
+  heroEyebrow     String?
+  heroTitle       String   @db.Text
+  heroHighlight   String?  @db.Text
+  heroDescription String   @db.Text
+  heroCtaLabel    String?
+  heroCtaHref     String?
+  heroCtaSecondaryLabel String?
+  heroCtaSecondaryHref  String?
+  bodyTitle       String?  @db.Text
+  bodyContent     String?  @db.LongText
+  proofTitle      String?
+  proofItems      String?  @db.Text
+  visualImage     String?
+  stats           String?  @db.Text
+  ctaEyebrow      String?
+  ctaTitle        String?  @db.Text
+  ctaDescription  String?  @db.Text
+  ctaLabel        String?
+  ctaHref         String?
+  seoTitle        String?
+  seoDescription  String?  @db.Text
+  isPublished     Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([isPublished])
+}
+
+model JobRole {
+  id          String   @id @default(cuid())
+  title       String
+  icon        String?
+  description String   @db.Text
+  department  String?
+  location    String?
+  type        String?
+  applyUrl    String?
+  isPublished Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([isPublished])
+  @@index([sortOrder])
+}
+
+model FooterLink {
+  id          String   @id @default(cuid())
+  groupSlug   String
+  groupLabel  String
+  label       String
+  href        String
+  isPublished Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([groupSlug])
   @@index([isPublished])
   @@index([sortOrder])
 }

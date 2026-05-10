@@ -41,7 +41,7 @@ export default async function AdminFeaturesPage() {
             <TextField label="Kategori" name="category" defaultValue="Genel" />
             <TextField label="Görsel tipi" name="visualType" defaultValue="icon" />
             <TextField label="Görsel URL" name="visualImage" />
-            <TextField label="Vurgu rengi" name="visualAccent" defaultValue="#B87333" />
+            <TextField label="Vurgu rengi" name="visualAccent" defaultValue="#2563EB" />
             <TextField label="Sıra" name="sortOrder" defaultValue={99} />
             <TextAreaField label="Kısa açıklama" name="shortDesc" required />
             <TextAreaField label="İçerik" name="content" required />
