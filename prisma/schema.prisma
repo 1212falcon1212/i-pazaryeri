@@ -114,11 +114,16 @@ model Post {
   coverImage     String?
   tag            String   @default("Rehber")
   isPublished    Boolean  @default(true)
+  isFeatured     Boolean  @default(false)
   sortOrder      Int      @default(0)
   seoTitle       String?
   seoDescription String?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+
+  @@index([isFeatured])
+  @@index([isPublished])
+  @@index([sortOrder])
 }
 
 model Testimonial {

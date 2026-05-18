@@ -43,10 +43,10 @@ export default async function PackagesPage() {
               </div>
 
               <h2 className="packages-promo-title">
-                İlk <strong>6 ay alana</strong>, ikinci <strong>6 ay bizden</strong>.
+                İlk <strong>6 ay bizden</strong>, ikinci <strong>6 ay sizden</strong>.
               </h2>
               <p className="packages-promo-desc">
-                Yıllık abonelikte ödediğin ilk 6 ay üzerine sonraki 6 ayı hediye veriyoruz — yani <strong>%50 indirimli yıllık kullanım</strong>. Tüm paketler için geçerli.
+                Yıllık abonelikte ilk 6 ayı hediye ediyoruz, sonraki 6 ayı siz ödüyorsunuz — yani <strong>%50 indirimli yıllık kullanım</strong>. Tüm paketler için geçerli.
               </p>
 
               <div className="packages-promo-points">
@@ -54,7 +54,7 @@ export default async function PackagesPage() {
                   <span className="packages-promo-point-icon"><Calendar size={16} /></span>
                   <div>
                     <strong>6 + 6 ay</strong>
-                    <span>İlk 6 ay normal, sonraki 6 ay ücretsiz</span>
+                    <span>İlk 6 ay ücretsiz, sonraki 6 ay normal</span>
                   </div>
                 </div>
                 <div className="packages-promo-point">

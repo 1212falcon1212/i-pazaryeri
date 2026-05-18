@@ -127,6 +127,9 @@ export default async function AdminBlogPage({ searchParams }: Props) {
                     <div className="field full admin-checkbox-row">
                       <CheckboxField label="Yayında" name="isPublished" defaultChecked={post.isPublished} />
                     </div>
+                    <div className="field full admin-checkbox-row">
+                      <CheckboxField label="Ana sayfada göster" name="isFeatured" defaultChecked={post.isFeatured} />
+                    </div>
                   </div>
                 </section>
 
@@ -190,6 +193,9 @@ export default async function AdminBlogPage({ searchParams }: Props) {
                   <TextAreaField label="Özet (excerpt)" name="excerpt" required />
                   <div className="field full admin-checkbox-row">
                     <CheckboxField label="Yayında" name="isPublished" defaultChecked />
+                  </div>
+                  <div className="field full admin-checkbox-row">
+                    <CheckboxField label="Ana sayfada göster" name="isFeatured" />
                   </div>
                 </div>
               </section>

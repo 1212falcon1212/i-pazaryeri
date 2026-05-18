@@ -20,11 +20,11 @@ import { PublicShell } from "@/components/public/PublicShell";
 import {
   getBusinessModelCards,
   getFeaturedFaqs,
+  getFeaturedPosts,
   getHomeStats,
   getIntegrationGroups,
   getPackages,
   getPlatformShowcaseCards,
-  getPosts,
   getSeoArticleSection,
   getSettings,
   getSolutionCards
@@ -110,7 +110,7 @@ export default async function HomePage() {
     settings,
     solutionCards,
     featuredFaqs,
-    posts,
+    featuredPosts,
     packages,
     seoArticle,
     businessModelCards,
@@ -121,7 +121,7 @@ export default async function HomePage() {
     getSettings(),
     getSolutionCards(),
     getFeaturedFaqs(),
-    getPosts(),
+    getFeaturedPosts(),
     getPackages(),
     getSeoArticleSection("homepage-after-blog"),
     getBusinessModelCards(),
@@ -621,7 +621,7 @@ export default async function HomePage() {
         ) : null}
 
         {/* ==================== BLOG ==================== */}
-        {posts.length > 0 ? (
+        {featuredPosts.length > 0 ? (
           <section className="blog-section">
             <div className="container">
               <div className="section-head centered">
@@ -629,7 +629,7 @@ export default async function HomePage() {
                 <h2>Karar süreçlerinize katkı sağlayan içerikler.</h2>
               </div>
               <div className="blog-grid">
-                {posts.slice(0, 3).map((post) => (
+                {featuredPosts.slice(0, 3).map((post) => (
                   <article className="blog-tile" key={post.id}>
                     <Link href={`/blog/${post.slug}`} className="blog-tile-cover" aria-label={post.title}>
                       {post.coverImage ? (

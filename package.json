@@ -9,7 +9,9 @@
     "test": "vitest run",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
-    "db:seed": "tsx prisma/seed.ts"
+    "db:seed": "tsx prisma/seed.ts",
+    "seo:seed": "tsx scripts/seed-seo-content.ts",
+    "legal:seed": "tsx scripts/seed-legal-pages.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

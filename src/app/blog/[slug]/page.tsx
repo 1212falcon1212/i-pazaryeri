@@ -7,7 +7,7 @@ import { RichContent, parseHeadings } from "@/components/public/RichContent";
 import { BlogTOC } from "@/components/public/BlogTOC";
 import { ReadingProgress } from "@/components/public/ReadingProgress";
 import { BlogShare } from "@/components/public/BlogShare";
-import { getPost, getRelatedPosts } from "@/lib/content";
+import { getPost, getRelatedPosts, getSettings } from "@/lib/content";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -41,7 +41,10 @@ export default async function BlogDetailPage({ params }: Props) {
   const { slug } = await params;
   const post = await getPost(slug);
   if (!post) notFound();
-  const related = await getRelatedPosts(slug, post.tag);
+  const [related, settings] = await Promise.all([
+    getRelatedPosts(slug, post.tag),
+    getSettings()
+  ]);
   const headings = parseHeadings(post.content);
   const readingTime = calcReadingTime(post.content);
   const publishedAt = formatDate(post.createdAt);
@@ -122,12 +125,16 @@ export default async function BlogDetailPage({ params }: Props) {
                     Teklif Al <ArrowRight size={14} />
                   </Link>
                   <div className="blog-sidebar-cta-divider" />
-                  <a href="mailto:info@i-pazaryeri.com" className="blog-sidebar-link">
-                    <Mail size={14} /> info@i-pazaryeri.com
-                  </a>
-                  <a href="tel:+908504411111" className="blog-sidebar-link">
-                    <Phone size={14} /> +90 850 441 11 11
-                  </a>
+                  {settings.contactEmail ? (
+                    <a href={`mailto:${settings.contactEmail}`} className="blog-sidebar-link">
+                      <Mail size={14} /> {settings.contactEmail}
+                    </a>
+                  ) : null}
+                  {settings.contactPhone ? (
+                    <a href={`tel:${settings.contactPhone.replace(/\s/g, "")}`} className="blog-sidebar-link">
+                      <Phone size={14} /> {settings.contactPhone}
+                    </a>
+                  ) : null}
                 </div>
 
                 {related.length > 0 ? (

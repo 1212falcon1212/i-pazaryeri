@@ -30,6 +30,7 @@ describe("validateOfferInput", () => {
     });
 
     expect(result.ok).toBe(false);
+    if (result.ok) throw new Error("Expected validation to fail");
     expect(result.errors).toContain("Telefon veya e-posta gereklidir.");
   });
 

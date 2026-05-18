@@ -42,6 +42,27 @@ function optional(formData: FormData, name: string) {
   return value.length === 0 ? null : value;
 }
 
+function revalidatePublicShell() {
+  revalidatePath("/", "layout");
+  for (const path of [
+    "/",
+    "/b2b",
+    "/b2c",
+    "/c2c",
+    "/blog",
+    "/entegrasyonlar",
+    "/hakkimizda",
+    "/kariyer",
+    "/ozellikler",
+    "/paketler",
+    "/sektorler",
+    "/sik-sorulan-sorular",
+    "/teklif-al"
+  ]) {
+    revalidatePath(path);
+  }
+}
+
 export async function updateSettings(formData: FormData) {
   await requireAdmin();
   await prisma.siteSetting.update({
@@ -87,7 +108,7 @@ export async function updateSettings(formData: FormData) {
       integrationsDesc: optional(formData, "integrationsDesc")
     }
   });
-  revalidatePath("/");
+  revalidatePublicShell();
   redirect("/admin/settings?saved=1");
 }
 
@@ -436,6 +457,7 @@ export async function savePost(formData: FormData) {
     content: str(formData, "content"),
     tag: str(formData, "tag") || "Rehber",
     isPublished: bool(formData, "isPublished"),
+    isFeatured: bool(formData, "isFeatured"),
     sortOrder: maybeNumber(formData, "sortOrder"),
     seoTitle: str(formData, "seoTitle"),
     seoDescription: str(formData, "seoDescription")

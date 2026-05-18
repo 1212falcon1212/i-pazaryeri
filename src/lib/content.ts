@@ -131,6 +131,13 @@ export const getPosts = cache(() =>
   })
 );
 
+export const getFeaturedPosts = cache(() =>
+  prisma.post.findMany({
+    where: { isPublished: true, isFeatured: true },
+    orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }]
+  })
+);
+
 export const getPost = cache((slug: string) =>
   prisma.post.findFirst({ where: { slug, isPublished: true } })
 );

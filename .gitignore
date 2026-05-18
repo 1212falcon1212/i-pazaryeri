@@ -21,3 +21,4 @@ public/uploads/*
 !public/uploads/hero-*.webp
 !public/uploads/banner-*.png
 !public/uploads/banner-*.webp
+scripts/dev.db
